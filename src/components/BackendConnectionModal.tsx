@@ -126,12 +126,40 @@ export const BackendConnectionModal: React.FC<BackendConnectionModalProps> = ({
 
         {/* Body */}
         <div className="my-5 space-y-4">
+          {/* MAS API Integration Status Card */}
+          <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 leading-relaxed space-y-2.5">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🇸🇬</span>
+                <div>
+                  <strong className="text-white block">MAS Official API Gateway Connection</strong>
+                  <span className="text-[11px] text-slate-400">Monthly Statistical Bulletin (Non-610)</span>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300">
+                /api/exchangerates
+              </span>
+            </div>
+
+            <p className="text-slate-400 text-[11px]">
+              Live MAS daily benchmark queries are wired to <code className="text-rose-400 font-mono">/api/exchangerates</code> using your header <code className="text-slate-200 font-mono">KeyId: &lt;MAS_KEY_ID&gt;</code>.
+            </p>
+
+            <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+              <span className="text-slate-400">Environment Key:</span>
+              <span className="font-mono text-slate-300 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                MAS_KEY_ID in .env
+              </span>
+            </div>
+          </div>
+
+          {/* Custom Backend Option */}
           <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 leading-relaxed">
             <div className="flex items-start gap-2">
               <Zap className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <div>
-                <strong className="text-white block mb-0.5">Ready for your backend:</strong>
-                As requested, the frontend is currently running with high-availability keyless public feeds. When you are ready with your backend service (Cloud Run, Node, Express, Python, or Go), simply paste your endpoint below. No API key required!
+                <strong className="text-white block mb-0.5">Custom Keyless Backend (Optional):</strong>
+                You can also point to an external or local proxy endpoint below. Leaving this empty defaults to the internal MAS backend route.
               </div>
             </div>
           </div>

@@ -40,13 +40,43 @@ export class ExchangeRateService {
   /**
    * Fetches latest SGD rates.
    * Priority:
-   * 1. User's keyless backend endpoint if configured
-   * 2. Keyless Public Open Exchange Rate Feed (https://open.er-api.com/v6/latest/SGD)
-   * 3. Keyless Frankfurter Feed (https://api.frankfurter.app/latest?from=SGD)
+   * 1. Internal /api/exchangerates (MAS Monthly Statistical Bulletin Non-610 API)
+   * 2. User's custom backend endpoint if configured
+   * 3. Keyless Public Open Exchange Rate Feed (https://open.er-api.com/v6/latest/SGD)
    * 4. Reliable baseline fallback
    */
   public async fetchLatestRates(): Promise<ExchangeRatesData> {
-    // 1. Try Custom Keyless Backend if user supplied one
+    // 1. Try internal /api/exchangerates (Monetary Authority of Singapore endpoint)
+    try {
+      const res = await fetch('/api/exchangerates', {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.rates) {
+          const rates = { ...BASELINE_SGD_RATES, ...json.rates, SGD: 1.0 };
+          const isMasLive = json.masConfigured === true && json.success === true;
+          const result: ExchangeRatesData = {
+            base: 'SGD',
+            timestamp: json.timestamp || Date.now(),
+            lastUpdated: new Date().toLocaleTimeString('en-SG', { timeZone: 'Asia/Singapore', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+            rates,
+            changes24h: this.calculateChanges(rates),
+            high24h: this.calculateHighs(rates),
+            low24h: this.calculateLows(rates),
+            source: isMasLive ? 'MAS Live API (Monetary Authority of Singapore)' : (json.source || 'MAS Gateway (Pending MAS_KEY_ID)'),
+            isBackendConnected: true,
+            backendEndpoint: '/api/exchangerates'
+          };
+          this.cacheData(result);
+          return result;
+        }
+      }
+    } catch {
+      // Backend not running or unreachable, continue to custom / external
+    }
+
+    // 2. Try Custom Keyless Backend if user supplied one
     if (this.customBackendUrl) {
       try {
         const response = await fetch(this.customBackendUrl, {
