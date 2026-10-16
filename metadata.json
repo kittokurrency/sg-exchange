@@ -1,0 +1,6 @@
+{
+  "name": "LionRate SG - Real-Time Singapore Dollar FX",
+  "description": "Singapore-based real-time currency exchange tool for SGD against global currencies, featuring interbank rates, retail money changer spreads, and ASEAN corridors.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
